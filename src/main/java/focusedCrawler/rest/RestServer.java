@@ -379,7 +379,7 @@ public class RestServer {
         
         MetricsManager metricsManager = null;
         try {
-            metricsManager = new MetricsManager(metricsRegistry, false);
+            metricsManager = new MetricsManager(metricsRegistry, false, dataOutputPath);
             
             Storage linkStorage = LinkStorage.createLinkStorage(configPath, seedPath,
                     dataOutputPath, modelPath, config.getLinkStorageConfig(), metricsManager);

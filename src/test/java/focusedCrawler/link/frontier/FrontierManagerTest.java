@@ -37,7 +37,7 @@ public class FrontierManagerTest {
     public TemporaryFolder tempFolder = new TemporaryFolder();
     
     private LinkFilter emptyLinkFilter = new LinkFilter(new ArrayList<String>());
-    private MetricsManager metricsManager = new MetricsManager();
+    private MetricsManager metricsManager ;
     private LinkStorageConfig config = new LinkStorageConfig();
     private Frontier frontier;
     private String dataPath;
@@ -58,6 +58,7 @@ public class FrontierManagerTest {
             "link_storage.download_sitemap_xml", downloadSitemapXml
         );
         config = new ConfigService(props).getLinkStorageConfig();
+        metricsManager = new MetricsManager();
     }
     
     @After
