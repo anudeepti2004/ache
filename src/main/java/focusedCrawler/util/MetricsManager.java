@@ -16,6 +16,7 @@ import com.codahale.metrics.Timer;
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 
 public class MetricsManager {
@@ -58,11 +59,6 @@ public class MetricsManager {
 					.convertDurationsTo(TimeUnit.MILLISECONDS).build();
 			reporter.start(10, TimeUnit.SECONDS);
 		}
-
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		mapper.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false);
-		mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
-		
 	}
 
 	/**
@@ -105,6 +101,8 @@ public class MetricsManager {
 		File metricsFile = new File(directoryPath+"/metrics/metrics.json");
 		if(metricsFile.exists()) {
 			try {
+			    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 				metricsRegistry = mapper.readValue(metricsFile,  MetricRegistry.class);
 			}catch(IOException e) {
 				logger.error("Unable to deserialize metrics registry: "+ e.getMessage());
