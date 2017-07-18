@@ -24,8 +24,9 @@ public class MetricsManager {
 	private final MetricRegistry metrics;
 	private ConsoleReporter reporter;
 	private String storageDirectory;
+	private MetricsModule module = new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false, MetricFilter.ALL);
 	private final ObjectMapper mapper = new ObjectMapper()
-			.registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.MILLISECONDS, false, MetricFilter.ALL));
+			.registerModule(module);
 	
 	private static final Logger logger = LoggerFactory.getLogger(MetricsManager.class);
 
@@ -54,6 +55,7 @@ public class MetricsManager {
 		}
 		this.storageDirectory = directoryPath;
 		//this.metrics = metricsRegistry;
+
 		if (startConsoleReporter) {
 			reporter = ConsoleReporter.forRegistry(metrics).convertRatesTo(TimeUnit.SECONDS)
 					.convertDurationsTo(TimeUnit.MILLISECONDS).build();
@@ -101,7 +103,7 @@ public class MetricsManager {
 		File metricsFile = new File(directoryPath+"/metrics/metrics.json");
 		if(metricsFile.exists()) {
 			try {
-			    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//			    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			    mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 				metricsRegistry = mapper.readValue(metricsFile,  MetricRegistry.class);
 			}catch(IOException e) {
