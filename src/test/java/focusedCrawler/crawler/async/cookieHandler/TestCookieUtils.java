@@ -57,6 +57,14 @@ public class TestCookieUtils {
 	}
 	
 	
+	@Test (expected =  IllegalArgumentException.class)
+	public void testOkkHttpCookieNullDomain() {
+		okhttp3.Cookie resultCookie = CookieUtils.getOkkHttpCookie(cookie);
+		assertTrue(resultCookie.name().equals("key1"));
+		assertTrue(resultCookie.value().equals("value1"));
+		assertTrue(resultCookie.domain() == null);
+	}
+	
 	@Test (expected = IllegalArgumentException.class)
 	public void testApacheCookielInputNullKey() {
 		cookie.setName(null);

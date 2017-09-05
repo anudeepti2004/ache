@@ -39,7 +39,7 @@ public class CookieUtils {
 		if(cookie.getDomain() != null) {
 			builder.domain(cookie.getDomain());
 		}else {
-			builder.domain("");
+			throw new IllegalArgumentException("Domain cannot be null while adding cookies");
 		}
 		
 		builder.path(cookie.getPath());
