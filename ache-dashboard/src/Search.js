@@ -4,24 +4,27 @@ import {
   ActionBar, ActionBarRow, HitsStats, ViewSwitcherToggle, SelectedFilters,
   ResetFilters, Pagination
 } from "searchkit";
-import URLUtils from './URLUtils';
 import {without} from "lodash";
-import {ACHE_API_ADDRESS} from './Config';
+import URLUtils from './URLUtils';
 
-const searchkit = new SearchkitManager(ACHE_API_ADDRESS);
+import {ACHE_API_ADDRESS} from './Config';
+import {api} from './RestApi';
+
+var searchkitProps;
+if(api.authorization !== undefined) {
+  searchkitProps = {
+    httpHeaders: {'Authorization': api.authorization}
+  };
+}
+
+const searchkit = new SearchkitManager(ACHE_API_ADDRESS, searchkitProps);
 
 class LabelsManager {
 
   constructor(apiAddress) {
     this.apiAddress = apiAddress;
     this.listeners = [];
-    fetch(apiAddress + "/labels")
-      .then(function(response) {
-        return response.json();
-      }, function(error) {
-        return 'FETCH_ERROR';
-      })
-      .then(this.updateLabelsCache.bind(this));
+    api.get("/labels").then(this.updateLabelsCache.bind(this));
   }
 
   addListener(fn) {
@@ -47,18 +50,13 @@ class LabelsManager {
   }
 
   sendLabels(labels, callback) {
-    fetch(this.apiAddress + "/labels", {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(labels)
-      })
-      .then(function(response) {
-        return response.json();
-      }, function(error) {
-        return 'FETCH_ERROR';
-      })
+      api.put(
+        "/labels",
+        {
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(labels)
+        }
+      )
       .then(this.updateLabelsCache.bind(this))
       .then(callback);
   }
@@ -178,14 +176,14 @@ class HitItem extends React.Component {
       <div className="row hit-item">
         <div className="col-sm-12">
           <div className="hit-title">
-            <a href={source.url} target="_blank">{pageTitle}</a>
+            <a href={source.url} target="_blank" rel="noopener noreferrer">{pageTitle}</a>
           </div>
           <div className="hit-url">
-            <a href={source.url} target="_blank">{source.url}</a>
+            <a href={source.url} target="_blank" rel="noopener noreferrer">{source.url}</a>
           </div>
           <div className="row">
             <div className="col-sm-2 hit-image">
-              <img src={this.extractImageFromSource(source)} alt="" />
+              <img src={this.extractImageFromSource(source)} alt="" referrerPolicy="no-referrer" />
             </div>
             <div className="col-sm-10">
               <div className="hit-description">{pageDesc}</div>
@@ -257,13 +255,7 @@ class Search extends React.Component {
 
   constructor(props) {
     super(props);
-    fetch(ACHE_API_ADDRESS + "/status")
-      .then(function(response) {
-        return response.json();
-      }, function(error) {
-        return 'FETCH_ERROR';
-      })
-      .then(this.setupSearch.bind(this));
+    api.get("/status").then(this.setupSearch.bind(this));
     this.state = {message:"Loading...", searchEnabled: false};
   }
 
